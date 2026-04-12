@@ -15,7 +15,7 @@ export default function LoginScreen({ navigation }) {
       return;
     }
 
-    // Aquí irá conexión con backend después
+    {/* Conexion backend aqui */}
     navigation.replace('Main');
   };
 

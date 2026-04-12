@@ -24,7 +24,7 @@ export default function HomeScreen({ navigation }) {
 
       <TouchableOpacity 
         style={styles.card}
-        onPress={() => navigation.navigate('Perfil')}
+        onPress={() => navigation.navigate('Profile')}
       >
         <Text style={styles.cardTitle}>Perfil</Text>
       </TouchableOpacity>

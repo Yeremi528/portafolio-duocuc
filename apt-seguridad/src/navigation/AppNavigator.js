@@ -5,6 +5,8 @@ import { Button } from 'react-native';
 import Login from '../screens/Login';
 import Main from '../screens/Main';
 import Register from '../screens/Register';
+import PerfilScreen from '../screens/Profile';
+import UploadImageScreen from '../screens/UploadImageScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -13,6 +15,8 @@ export default function AppNavigator() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Profile" component={PerfilScreen}/>
+        <Stack.Screen name="Upload" component={UploadImageScreen}/>
         <Stack.Screen 
             name="Main" 
             component={Main} 
@@ -26,6 +30,7 @@ export default function AppNavigator() {
                 title: 'APT Seguridad'
                 })}
             />
+        
         <Stack.Screen name="Register" component={Register} />
       </Stack.Navigator>
     </NavigationContainer>
