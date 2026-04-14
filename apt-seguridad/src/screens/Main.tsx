@@ -1,7 +1,13 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { colors } from '../styles/Colors';
+import { RootStackParamList } from '../types/navigation';
 
-export default function HomeScreen({ navigation }) {
+type MainScreenProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, 'Main'>;
+};
+
+export default function HomeScreen({ navigation }: MainScreenProps) {
   return (
     <View style={styles.container}>
 
@@ -10,7 +16,7 @@ export default function HomeScreen({ navigation }) {
       <Text style={styles.subtitle}>Bienvenido</Text>
 
       {/* Botón principal */}
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.mainButton}
         onPress={() => navigation.navigate('Upload')}
       >
@@ -22,7 +28,7 @@ export default function HomeScreen({ navigation }) {
         <Text style={styles.cardTitle}>Últimos análisis</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.card}
         onPress={() => navigation.navigate('Profile')}
       >
@@ -38,40 +44,40 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: 20,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   title: {
     fontSize: 26,
     fontWeight: 'bold',
     color: colors.primary,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   subtitle: {
     textAlign: 'center',
     marginBottom: 40,
-    color: colors.text
+    color: colors.text,
   },
   mainButton: {
     backgroundColor: colors.primary,
     padding: 20,
     borderRadius: 12,
     marginBottom: 20,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   mainButtonText: {
     color: 'white',
     fontSize: 16,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   card: {
     backgroundColor: 'white',
     padding: 15,
     borderRadius: 10,
     marginBottom: 15,
-    elevation: 2
+    elevation: 2,
   },
   cardTitle: {
     fontSize: 16,
-    color: colors.text
-  }
+    color: colors.text,
+  },
 });

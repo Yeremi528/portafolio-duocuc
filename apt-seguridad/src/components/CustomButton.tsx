@@ -1,7 +1,12 @@
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { colors } from '../styles/Colors.js';
+import { colors } from '../styles/Colors';
 
-export default function CustomButton({ title, onPress }) {
+type CustomButtonProps = {
+  title: string;
+  onPress: () => void;
+};
+
+export default function CustomButton({ title, onPress }: CustomButtonProps) {
   return (
     <TouchableOpacity style={styles.button} onPress={onPress}>
       <Text style={styles.text}>{title}</Text>
@@ -15,11 +20,11 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
-    width: '100%'
+    width: '100%',
   },
   text: {
     color: colors.white,
     fontWeight: 'bold',
-    fontSize: 16
-  }
+    fontSize: 16,
+  },
 });

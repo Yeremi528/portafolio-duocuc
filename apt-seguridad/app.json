@@ -16,6 +16,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.apt.seguridad.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -24,6 +25,14 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6a3e0c25-bf8a-4053-a8e3-1d29f2d8c2de"
+      }
+    },
+    "plugins": [
+      "expo-web-browser"
+    ]
   }
 }

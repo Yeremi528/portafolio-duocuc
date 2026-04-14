@@ -1,7 +1,14 @@
 import { View, TextInput, StyleSheet } from 'react-native';
-import { colors } from '../styles/Colors.js';
+import { colors } from '../styles/Colors';
 
-export default function InputField({ placeholder, value, onChangeText, secureTextEntry }) {
+type InputFieldProps = {
+  placeholder: string;
+  value: string;
+  onChangeText: (text: string) => void;
+  secureTextEntry?: boolean;
+};
+
+export default function InputField({ placeholder, value, onChangeText, secureTextEntry }: InputFieldProps) {
   return (
     <View style={styles.container}>
       <TextInput
@@ -19,13 +26,13 @@ export default function InputField({ placeholder, value, onChangeText, secureTex
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    marginBottom: 15
+    marginBottom: 15,
   },
   input: {
     backgroundColor: colors.white,
     padding: 15,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#ddd'
-  }
+    borderColor: '#ddd',
+  },
 });

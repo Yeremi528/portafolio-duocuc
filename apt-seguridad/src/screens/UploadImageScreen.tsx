@@ -1,10 +1,10 @@
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  Image, 
-  Alert 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Alert,
 } from 'react-native';
 import { useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
@@ -12,10 +12,10 @@ import { colors } from '../styles/Colors';
 
 export default function UploadImageScreen() {
 
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState<string | null>(null);
 
-  {/* Tomar foto */}
-  const takePhoto = async () => {
+  /* Tomar foto */
+  const takePhoto = async (): Promise<void> => {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
 
     if (!permission.granted) {
@@ -23,9 +23,9 @@ export default function UploadImageScreen() {
       return;
     }
 
-    let result = await ImagePicker.launchCameraAsync({
+    const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
-      quality: 1
+      quality: 1,
     });
 
     if (!result.canceled) {
@@ -33,8 +33,8 @@ export default function UploadImageScreen() {
     }
   };
 
-  {/* Abre galeria */}
-  const pickImage = async () => {
+  /* Abre galeria */
+  const pickImage = async (): Promise<void> => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!permission.granted) {
@@ -42,9 +42,9 @@ export default function UploadImageScreen() {
       return;
     }
 
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
-      quality: 1
+      quality: 1,
     });
 
     if (!result.canceled) {
@@ -52,8 +52,8 @@ export default function UploadImageScreen() {
     }
   };
 
-  {/* Analizar imagen ia*/}
-  const handleAnalyze = () => {
+  /* Analizar imagen IA */
+  const handleAnalyze = (): void => {
     if (!image) {
       Alert.alert('Error', 'Primero selecciona una imagen');
       return;
@@ -98,54 +98,47 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: colors.background
+    backgroundColor: colors.background,
   },
-
   title: {
     fontSize: 22,
     fontWeight: 'bold',
     color: colors.primary,
     marginBottom: 20,
-    textAlign: 'center'
+    textAlign: 'center',
   },
-
   imageContainer: {
     height: 250,
     backgroundColor: '#ddd',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20
+    marginBottom: 20,
   },
-
   image: {
     width: '100%',
     height: '100%',
-    borderRadius: 12
+    borderRadius: 12,
   },
-
   placeholder: {
-    color: '#666'
+    color: '#666',
   },
-
   button: {
     backgroundColor: colors.secondary,
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
-    alignItems: 'center'
+    alignItems: 'center',
   },
-
   analyzeButton: {
     backgroundColor: colors.primary,
     padding: 15,
     borderRadius: 10,
     marginTop: 10,
-    alignItems: 'center'
+    alignItems: 'center',
   },
-
   buttonText: {
     color: 'white',
-    fontWeight: 'bold'
-  }
+    fontWeight: 'bold',
+  },
 });

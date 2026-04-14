@@ -1,16 +1,28 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { colors } from '../styles/Colors';
+import { RootStackParamList } from '../types/navigation';
 
-export default function ProfileScreen({ navigation }) {
+type ProfileScreenProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, 'Profile'>;
+};
 
-  {/* Ejemplo */}
-  const user = {
+type User = {
+  name: string;
+  email: string;
+  photo: string | null;
+};
+
+export default function ProfileScreen({ navigation }: ProfileScreenProps) {
+
+  /* Ejemplo */
+  const user: User = {
     name: 'Prueba',
     email: 'prueba@email.com',
-    photo: null
+    photo: null,
   };
 
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     navigation.replace('Login');
   };
 
@@ -28,13 +40,13 @@ export default function ProfileScreen({ navigation }) {
         )}
       </View>
 
-       {/* Nombre */}
+      {/* Nombre */}
       <Text style={styles.name}>{user.name}</Text>
 
-       {/* Email */} 
+      {/* Email */}
       <Text style={styles.email}>{user.email}</Text>
 
-       {/* Info */}
+      {/* Info */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Información</Text>
         <Text style={styles.label}>Correo</Text>
@@ -54,82 +66,70 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: 20,
-    alignItems: 'center'
+    alignItems: 'center',
   },
-
   avatarContainer: {
     marginTop: 20,
-    marginBottom: 10
+    marginBottom: 10,
   },
-
   avatar: {
     width: 100,
     height: 100,
-    borderRadius: 50
+    borderRadius: 50,
   },
-
   avatarPlaceholder: {
     width: 100,
     height: 100,
     borderRadius: 50,
     backgroundColor: colors.primary,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
-
   avatarText: {
     color: 'white',
     fontSize: 32,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
-
   name: {
     fontSize: 22,
     fontWeight: 'bold',
     color: colors.primary,
-    marginTop: 10
+    marginTop: 10,
   },
-
   email: {
     color: colors.text,
-    marginBottom: 20
+    marginBottom: 20,
   },
-
   card: {
     width: '100%',
     backgroundColor: 'white',
     padding: 15,
     borderRadius: 12,
     elevation: 3,
-    marginBottom: 20
+    marginBottom: 20,
   },
-
   cardTitle: {
     fontWeight: 'bold',
     marginBottom: 10,
-    color: colors.primary
+    color: colors.primary,
   },
-
   label: {
-    color: '#999'
+    color: '#999',
   },
-
   value: {
     fontSize: 16,
     marginBottom: 10,
-    color: colors.text
+    color: colors.text,
   },
-
   logout: {
     backgroundColor: colors.danger,
     padding: 15,
     borderRadius: 12,
     width: '100%',
-    alignItems: 'center'
+    alignItems: 'center',
   },
-
   logoutText: {
     color: 'white',
-    fontWeight: 'bold'
-  }
+    fontWeight: 'bold',
+  },
 });

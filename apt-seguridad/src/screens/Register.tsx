@@ -1,28 +1,33 @@
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useState } from 'react';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import InputField from '../components/InputField';
 import CustomButton from '../components/CustomButton';
 import { colors } from '../styles/Colors';
+import { RootStackParamList } from '../types/navigation';
 
-export default function LoginScreen({ navigation }) {
+type RegisterScreenProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, 'Register'>;
+};
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export default function RegisterScreen({ navigation }: RegisterScreenProps) {
 
-  const handleLogin = () => {
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+
+  const handleRegister = (): void => {
     if (!email || !password) {
       Alert.alert('Error', 'Completa todos los campos');
       return;
     }
 
-    {/* Conexion backend aqui */}
-    navigation.replace('Main');
+    Alert.alert('Éxito', 'Cuenta creada');
+    navigation.navigate('Login');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>APT Seguridad</Text>
-      <Text style={styles.subtitle}>Inicia sesión</Text>
+      <Text style={styles.title}>Crear cuenta</Text>
 
       <InputField
         placeholder="Correo electrónico"
@@ -37,11 +42,11 @@ export default function LoginScreen({ navigation }) {
         secureTextEntry
       />
 
-      <CustomButton title="Ingresar" onPress={handleLogin} />
+      <CustomButton title="Registrarse" onPress={handleRegister} />
 
-      <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
         <Text style={styles.link}>
-          ¿No tienes cuenta? Regístrate
+          ¿Ya tienes cuenta? Inicia sesión
         </Text>
       </TouchableOpacity>
     </View>
@@ -53,24 +58,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     justifyContent: 'center',
-    padding: 20
+    padding: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
     color: colors.primary,
-    marginBottom: 10,
-    textAlign: 'center'
-  },
-  subtitle: {
-    fontSize: 16,
     marginBottom: 30,
     textAlign: 'center',
-    color: colors.text
   },
   link: {
     marginTop: 15,
     color: colors.secondary,
-    textAlign: 'center'
-  }
+    textAlign: 'center',
+  },
 });
