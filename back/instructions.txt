@@ -1,0 +1,39 @@
+Actúa como un desarrollador backend experto en Go. Tu objetivo es configurar la estructura base de un proyecto, manejar variables de entorno y crear un servicio para consumir la API de Gemini que devuelva respuestas estructuradas en formato JSON.
+
+1. Configuración y Seguridad (.gitignore y config.yaml):
+
+Crea un archivo config.yaml en la raíz del proyecto para centralizar las variables. Este archivo debe ser leído desde un paquete config y sus valores traspasados a la capa de main.go.
+
+La estructura del config.yaml debe incluir:
+
+MONGODB_URI: mongodb+srv://yerearaya_db_user:PFXlUorBhoYaHJd1@cluster0.d2vi4tj.mongodb.net/?appName=Cluster0
+
+GEMINI_API_KEY: AIzaSyAIbHvpMjtmrSxq0EuOxSqu9VbevC2HKQ0
+
+GCP_CREDENTIALS: La ruta hacia el archivo de la cuenta de servicio (p. ej., security-apt.json ubicado en la raíz).
+
+Como no tenemos un JWT_SECRET, implementa una función o indícame el comando para generar uno seguro y añádelo a la configuración.
+
+Configura rigurosamente el archivo .gitignore a la raíz del proyecto para ignorar config.yaml, security-apt.json y cualquier otra credencial o archivo compilado que no deba subirse al repositorio.
+
+2. Integración con Gemini AI y Mapeo de Opciones:
+
+Implementa el cliente para consumir la IA de Gemini.
+
+Crea un sistema de mapeo (usando un mapa o un switch) que reciba un ID u opción y seleccione uno de los siguientes 4 system prompts para enviar a la IA:
+
+Opción 1: "Quiero mejorar mi seguridad"
+
+Opción 2: "Quiero que me digas las vulnerabilidades de mi hogar"
+
+Opción 3: "Quiero recomendaciones"
+
+Opción 4: "Quiero contratar un seguro"
+
+3. Estructura de Respuesta y Tipado Estricto (Go Structs):
+
+Basado en el contexto de la aplicación (seguridad del hogar, análisis de vulnerabilidades y seguros), define una estructura de datos (struct en Go) robusta e inteligente que sirva para englobar la respuesta de la IA para cualquiera de estos 4 escenarios.
+
+Asegúrate de instruir a la IA de Gemini en el código para que su output sea estrictamente un JSON que coincida exactamente con los campos de la estructura que definiste.
+
+Proporciona el código de implementación donde se consume la API, se recibe la respuesta en texto, y se utiliza json.Unmarshal para parsear ese JSON directamente hacia la estructura definida en Go, manejando los posibles errores de parseo.

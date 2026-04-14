@@ -1,0 +1,26 @@
+API:
+  HOST: 0.0.0.0:8080
+  READ_TIMEOUT: 5s
+  WRITE_TIMEOUT: 10s
+  IDLE_TIMEOUT: 180s
+  SHUTDOWN_TIMEOUT: 20s
+
+DEBUG:
+  HOST: 0.0.0.0:8081
+  READ_TIMEOUT: 180s
+  WRITE_TIMEOUT: 180s
+  IDLE_TIMEOUT: 180s
+  SHUTDOWN_TIMEOUT: 20s
+
+MONGODB_URI: 
+
+GEMINI_API_KEY: ""
+
+GCP_CREDENTIALS: "security-apt.json"
+
+BUCKET_NAME: "go-security-images"
+
+
+GOOGLE_CLIENT_IDS:
+  - "149022845847-7ul7pgcobsh90oc5g4sd8tpnud4qhqhv.apps.googleusercontent.com"
+  - "149022845847-sm8pmaj93go4poi7jh5m8mneu4kn9e57.apps.googleusercontent.com"
