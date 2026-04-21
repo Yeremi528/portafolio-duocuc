@@ -44,6 +44,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Hook Web: Debe declararse en el nivel superior, sin importar la plataforma
   const redirectUri = makeRedirectUri({ scheme: 'itudy' });
+  console.log('[Auth] redirectUri:', redirectUri);
   const [request, response, promptAsync] = Google.useAuthRequest({
     webClientId: WEB_CLIENT_ID,
     androidClientId: ANDROID_CLIENT_ID,
@@ -109,35 +110,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   async function handleBackendLogin(token: string) {
     try {
       setIsLoading(true);
-      const apiUrl = Platform.OS === 'android' 
-        ? `${URL_BASE}` 
-        : `${URL_BASE}`;
-
-      console.log(`Enviando token a: ${apiUrl}/oauth/google/login`);
+      console.log(`[Auth] Enviando token a: ${URL_BASE}/oauth/google/login`);
 
       const { data } = await axios.post(
-        `${apiUrl}/oauth/google/login`,
+        `${URL_BASE}/oauth/google/login`,
         {},
-        {
-          headers: {
-            Authorization: `${token}` 
-          }
-        }
+        { headers: { Authorization: token } }
       );
-      
+
       const userData = data.user || data;
-      
       if (!userData) throw new Error("No se recibieron datos del usuario");
 
       setUser(userData);
       await AsyncStorage.setItem('@user', JSON.stringify(userData));
 
     } catch (error) {
-      console.error("Error en login backend:", error);
-      if (axios.isAxiosError(error) && error.response) {
-        console.error("Detalle del error:", error.response.data);
+      if (axios.isAxiosError(error)) {
+        console.error('[Auth] Status:', error.response?.status);
+        console.error('[Auth] Body:', JSON.stringify(error.response?.data, null, 2));
+        console.error('[Auth] Headers enviados:', error.config?.headers);
+        alert(`Error ${error.response?.status ?? 'red'}: ${JSON.stringify(error.response?.data)}`);
+      } else {
+        console.error('[Auth] Error inesperado:', error);
+        alert("Error inesperado. Revisa la consola.");
       }
-      alert("Error al conectar con el servidor. Revisa la consola.");
     } finally {
       setIsLoading(false);
     }

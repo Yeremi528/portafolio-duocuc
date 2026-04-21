@@ -14,7 +14,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   const { signIn, isLoading, user } = useAuth();
 
   useEffect(() => {
-    if (user) navigation.replace('Main');
+    if (user) navigation.replace('Tabs');
   }, [user]);
 
   const handleGoogleLogin = async (): Promise<void> => {
