@@ -48,17 +48,27 @@ func main() {
 
 func run(ctx context.Context, log *logger.Logger) error {
 
-	var cfg Config
+	var (
+		cfg Config
+		err error
+	)
 
-	sm, err := secretmanager.New(ctx, secretmanager.Config{
-		ProjectID: os.Getenv("PROJECT_ID"),
-	})
-	if err != nil {
-		return fmt.Errorf("run: error inicializando secret manager: %w", err)
-	}
-	cfg, err = loadRemoteConfig(ctx, sm)
-	if err != nil {
-		return fmt.Errorf("run: error cargando config remoto: %w", err)
+	if os.Getenv("ENV") == "local" {
+		cfg, err = loadLocalConfig()
+		if err != nil {
+			return fmt.Errorf("run: error cargando config local: %w", err)
+		}
+	} else {
+		sm, err := secretmanager.New(ctx, secretmanager.Config{
+			ProjectID: os.Getenv("PROJECT_ID"),
+		})
+		if err != nil {
+			return fmt.Errorf("run: error inicializando secret manager: %w", err)
+		}
+		cfg, err = loadRemoteConfig(ctx, sm)
+		if err != nil {
+			return fmt.Errorf("run: error cargando config remoto: %w", err)
+		}
 	}
 
 	// -----------------------------------------------------------------------

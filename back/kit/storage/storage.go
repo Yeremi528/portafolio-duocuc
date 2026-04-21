@@ -65,3 +65,23 @@ func (c *Client) DownloadFile(ctx context.Context, imagePath string) ([]byte, er
 
 	return data, nil
 }
+
+// UploadFile sube bytes al bucket y adjunta metadata al objeto.
+// objectName es la ruta destino dentro del bucket (ej. "security-images/rut/uuid.jpg").
+func (c *Client) UploadFile(ctx context.Context, objectName string, data []byte, metadata map[string]string) error {
+	if len(objectName) > 0 && objectName[0] == '/' {
+		objectName = objectName[1:]
+	}
+
+	writer := c.gcs.Bucket(c.bucket).Object(objectName).NewWriter(ctx)
+	writer.Metadata = metadata
+
+	if _, err := writer.Write(data); err != nil {
+		writer.Close()
+		return fmt.Errorf("storage.UploadFile: error escribiendo '%s': %w", objectName, err)
+	}
+	if err := writer.Close(); err != nil {
+		return fmt.Errorf("storage.UploadFile: error cerrando writer '%s': %w", objectName, err)
+	}
+	return nil
+}

@@ -12,9 +12,9 @@ DEBUG:
   IDLE_TIMEOUT: 180s
   SHUTDOWN_TIMEOUT: 20s
 
-MONGODB_URI: 
+MONGODB_URI: mongodb+srv://yerearaya_db_user:PFXlUorBhoYaHJd1@cluster0.d2vi4tj.mongodb.net/?appName=Cluster0
 
-GEMINI_API_KEY: ""
+GEMINI_API_KEY: "AIzaSyA-xoARpckFxjMV2ydWBfBNMOgXyGIJKy0"
 
 GCP_CREDENTIALS: "security-apt.json"
 

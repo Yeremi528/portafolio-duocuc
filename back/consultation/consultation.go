@@ -8,6 +8,7 @@ import (
 
 // Service define las operaciones de negocio del módulo de consultas de seguridad.
 type Service interface {
+	Upload(ctx context.Context, rut string, imageData []byte) (string, error)
 	Analyze(ctx context.Context, rut string, req AnalyzeRequest) (gemini.SecurityAnalysis, error)
 	ListByRUT(ctx context.Context, rut string) ([]ConsultaSummary, error)
 	GetByID(ctx context.Context, id string) (Consulta, error)
@@ -23,6 +24,7 @@ type Repository interface {
 // StorageClient abstrae el acceso al bucket privado de imágenes.
 type StorageClient interface {
 	DownloadFile(ctx context.Context, imagePath string) ([]byte, error)
+	UploadFile(ctx context.Context, objectName string, data []byte, metadata map[string]string) error
 }
 
 // AIClient abstrae las llamadas al modelo multimodal de IA.

@@ -12,6 +12,18 @@ import (
 	"go-security/kit/web"
 )
 
+func (s *service) Upload(ctx context.Context, rut string, imageData []byte) (string, error) {
+	objectName := fmt.Sprintf("security-images/%s/%s.jpg", rut, uuid.NewString())
+	metadata := map[string]string{
+		"rut":         rut,
+		"uploaded_at": time.Now().UTC().Format(time.RFC3339),
+	}
+	if err := s.storage.UploadFile(ctx, objectName, imageData, metadata); err != nil {
+		return "", fmt.Errorf("consultation.Upload: %w", err)
+	}
+	return "/" + objectName, nil
+}
+
 type service struct {
 	repo    Repository
 	storage StorageClient
