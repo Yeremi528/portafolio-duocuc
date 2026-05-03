@@ -14,7 +14,11 @@ type Config struct {
 	Web            WebConfig   `yaml:"API"`
 	Debug          DebugConfig `yaml:"DEBUG"`
 	MongoURI       string      `yaml:"MONGODB_URI"`
+	AIProvider     string      `yaml:"AI_PROVIDER"`   // "gemini" | "claude"
 	GeminiAPIKey   string      `yaml:"GEMINI_API_KEY"`
+	GeminiModel    string      `yaml:"GEMINI_MODEL"`
+	ClaudeAPIKey   string      `yaml:"CLAUDE_API_KEY"`
+	ClaudeModel    string      `yaml:"CLAUDE_MODEL"`
 	GCPCredentials string      `yaml:"GCP_CREDENTIALS"`
 	BucketName       string      `yaml:"BUCKET_NAME"`
 	JWTSecret        string      `yaml:"JWT_SECRET"`

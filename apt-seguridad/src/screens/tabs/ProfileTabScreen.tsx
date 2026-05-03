@@ -52,14 +52,19 @@ export default function ProfileTabScreen() {
       setSigningOut(true);
       signOut().catch(() => setSigningOut(false));
     };
-    Alert.alert(
-      'Cerrar sesión',
-      '¿Estás seguro que deseas salir?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Salir', style: 'destructive', onPress: doSignOut },
-      ],
-    );
+
+    if (Platform.OS === 'web') {
+      if (window.confirm('¿Estás seguro que deseas cerrar sesión?')) doSignOut();
+    } else {
+      Alert.alert(
+        'Cerrar sesión',
+        '¿Estás seguro que deseas salir?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Salir', style: 'destructive', onPress: doSignOut },
+        ],
+      );
+    }
   }
 
   const initial = (user?.name ?? 'U')[0].toUpperCase();

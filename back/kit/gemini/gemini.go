@@ -17,11 +17,12 @@ type Client struct {
 }
 
 // NewClient crea un cliente Gemini listo para usar.
-func NewClient(apiKey string) *Client {
-	return &Client{
-		apiKey: apiKey,
-		model:  "gemini-1.5-flash",
+// Si model está vacío usa gemini-2.0-flash como default.
+func NewClient(apiKey, model string) *Client {
+	if model == "" {
+		model = "gemini-2.0-flash"
 	}
+	return &Client{apiKey: apiKey, model: model}
 }
 
 // Analyze envía el prompt del sistema + la imagen + el presupuesto a Gemini y

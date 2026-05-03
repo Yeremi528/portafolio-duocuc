@@ -1,21 +1,9 @@
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, Image } from 'react-native';
-import { useEffect } from 'react';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuth } from '../context/authContext';
 import { colors } from '../styles/Colors';
-import { RootStackParamList } from '../types/navigation';
 
-type LoginScreenProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
-};
-
-export default function LoginScreen({ navigation }: LoginScreenProps) {
-
-  const { signIn, isLoading, user } = useAuth();
-
-  useEffect(() => {
-    if (user) navigation.replace('Tabs');
-  }, [user]);
+export default function LoginScreen() {
+  const { signIn, isLoading } = useAuth();
 
   const handleGoogleLogin = async (): Promise<void> => {
     try {

@@ -7,10 +7,12 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
+	"strings"
 	"syscall"
 
 	"go-security/consultation"
 	consultationdb "go-security/consultation/repository/consultationdb"
+	kclaude "go-security/kit/claude"
 	kgemini "go-security/kit/gemini"
 	"go-security/kit/logger"
 	db "go-security/kit/mongo"
@@ -92,13 +94,34 @@ func run(ctx context.Context, log *logger.Logger) error {
 	// -----------------------------------------------------------------------
 	// Clientes externos
 
-	storageClient, err := kstorage.New(ctx, cfg.BucketName, cfg.GCPCredentials)
-	if err != nil {
-		return fmt.Errorf("run: error inicializando cliente GCS: %w", err)
+	type storageCloser interface {
+		consultation.StorageClient
+		Close() error
+	}
+
+	var storageClient storageCloser
+	if strings.EqualFold(os.Getenv("ENV"), "local") || strings.EqualFold(os.Getenv("env"), "local") {
+		storageClient, err = kstorage.NewLocal("./tmp/bucket")
+		if err != nil {
+			return fmt.Errorf("run: error inicializando almacenamiento local: %w", err)
+		}
+		log.Info(ctx, "Usando almacenamiento LOCAL (./tmp/bucket)")
+	} else {
+		storageClient, err = kstorage.New(ctx, cfg.BucketName, cfg.GCPCredentials)
+		if err != nil {
+			return fmt.Errorf("run: error inicializando cliente GCS: %w", err)
+		}
 	}
 	defer storageClient.Close()
 
-	aiClient := kgemini.NewClient(cfg.GeminiAPIKey)
+	var aiClient consultation.AIClient
+	if strings.EqualFold(cfg.AIProvider, "claude") {
+		aiClient = kclaude.NewClient(cfg.ClaudeAPIKey, cfg.ClaudeModel)
+		log.Info(ctx, "Usando proveedor de IA: Claude", "model", cfg.ClaudeModel)
+	} else {
+		aiClient = kgemini.NewClient(cfg.GeminiAPIKey, cfg.GeminiModel)
+		log.Info(ctx, "Usando proveedor de IA: Gemini", "model", cfg.GeminiModel)
+	}
 
 	// -----------------------------------------------------------------------
 	// Servicios
@@ -122,6 +145,18 @@ func run(ctx context.Context, log *logger.Logger) error {
 	router.Use(mids.Logging(log))
 	router.Use(mids.Recoverer(log))
 	router.Use(mids.ErrorRecoveryMiddleware)
+
+	// Health check
+	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status":"ok","service":"go-security"}`))
+	})
+	router.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status":"ok"}`))
+	})
 
 	// Rutas públicas (sin JWT)
 	oauth.MakeHandlerWith(oauthService).SetRoutesTo(router)

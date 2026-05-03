@@ -81,12 +81,17 @@ func (s *service) ListByRUT(ctx context.Context, rut string) ([]ConsultaSummary,
 	summaries := make([]ConsultaSummary, len(consultas))
 	for i, c := range consultas {
 		summaries[i] = ConsultaSummary{
-			ID:          c.ID,
-			OptionID:    c.OptionID,
-			ImagePath:   c.ImagePath,
-			OverallRisk: c.AIResult.OverallRisk,
-			Summary:     c.AIResult.Summary,
-			CreatedAt:   c.CreatedAt,
+			ID:                   c.ID,
+			OptionID:             c.OptionID,
+			ImagePath:            c.ImagePath,
+			OverallRisk:          c.AIResult.OverallRisk,
+			Summary:              c.AIResult.Summary,
+			Vulnerabilities:      c.AIResult.Vulnerabilities,
+			Recommendations:      c.AIResult.Recommendations,
+			InsuranceSuggestions: c.AIResult.InsuranceSuggestions,
+			EstimatedCost:        c.AIResult.EstimatedCost,
+			Priority:             c.AIResult.Priority,
+			CreatedAt:            c.CreatedAt,
 		}
 	}
 	return summaries, nil

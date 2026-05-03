@@ -33,7 +33,7 @@ func Authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		// --- Modo local: saltar validación JWT ---
-		if os.Getenv("env") == "local" {
+		if strings.EqualFold(os.Getenv("ENV"), "local") || strings.EqualFold(os.Getenv("env"), "local") {
 			rut := r.Header.Get("X-RUT")
 			if rut == "" {
 				rut = "00000000-0" // RUT de prueba por defecto

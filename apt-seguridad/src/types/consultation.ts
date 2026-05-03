@@ -49,6 +49,11 @@ export type ConsultaSummary = {
   image_path: string;
   overall_risk: RiskLevel;
   summary: string;
+  vulnerabilities: Vulnerability[];
+  recommendations: Recommendation[];
+  insurance_suggestions: InsuranceSuggestion[];
+  estimated_cost: EstimatedCost | null;
+  priority: Priority;
   created_at: string;
 };
 

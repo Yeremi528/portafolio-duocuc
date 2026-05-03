@@ -1,23 +1,17 @@
-// context/AuthContext.tsx
-import { URL_BASE } from '@/constants/URL';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin, isErrorWithCode, statusCodes } from '@react-native-google-signin/google-signin';
-import axios from 'axios';
-import { makeRedirectUri } from 'expo-auth-session';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
+import axios from 'axios';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
+import { URL_BASE } from '@/constants/URL';
 
-// Necesario para que el flujo web cierre correctamente la ventana de autenticación
 WebBrowser.maybeCompleteAuthSession();
 
+// Web client ID — used on all platforms to get an idToken the backend can verify.
+// On native, GoogleSignin.configure(webClientId) requests an idToken signed for this client.
 const WEB_CLIENT_ID = '149022845847-7ul7pgcobsh90oc5g4sd8tpnud4qhqhv.apps.googleusercontent.com';
-const ANDROID_CLIENT_ID = '149022845847-sm8pmaj93go4poi7jh5m8mneu4kn9e57.apps.googleusercontent.com';
-
-
-
-
 
 export type User = {
   id: string;
@@ -35,166 +29,137 @@ type AuthContextType = {
 };
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
-
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser]         = useState<User | null>(null);
+  const [isLoading, setLoading] = useState(true);
 
-  // Hook Web: Debe declararse en el nivel superior, sin importar la plataforma
-  const redirectUri = makeRedirectUri({ scheme: 'itudy' });
-  console.log('[Auth] redirectUri:', redirectUri);
-  const [request, response, promptAsync] = Google.useAuthRequest({
+  // Web-only hook — must be declared unconditionally (Rules of Hooks)
+  const [, webResponse, promptAsync] = Google.useAuthRequest({
     webClientId: WEB_CLIENT_ID,
-    androidClientId: ANDROID_CLIENT_ID,
-    redirectUri: redirectUri,
-    scopes: ['openid', 'profile', 'email'],
+    scopes:      ['openid', 'profile', 'email'],
     responseType: 'id_token',
   });
 
   useEffect(() => {
-    // Configuración Nativa (Solo Android e iOS)
     if (Platform.OS !== 'web') {
-      GoogleSignin.configure({
-        webClientId: WEB_CLIENT_ID, // Siempre se usa el Web ID para obtener el idToken para el backend
-      });
+      GoogleSignin.configure({ webClientId: WEB_CLIENT_ID });
     }
-    loadStorageData();
+    restoreSession();
   }, []);
 
-  const updateUserData = async (updates: Partial<User>) => {
-    if (!user) return;
-    const updatedUser = { ...user, ...updates };
-    setUser(updatedUser);
-    try {
-      await AsyncStorage.setItem('@user', JSON.stringify(updatedUser));
-    } catch (e) {
-      console.error("Error guardando actualización de usuario", e);
-    }
-  };
-
-  // Efecto para procesar la respuesta de la Web
+  // Process web OAuth response
   useEffect(() => {
-    if (Platform.OS === 'web' && response?.type === 'success') {
-      console.log("Respuesta Web de Google Auth:", response);
-      const idToken = response.params.id_token || response.authentication?.idToken || response.authentication?.accessToken;
-      
+    if (Platform.OS !== 'web' || !webResponse) return;
+
+    if (webResponse.type === 'success') {
+      const idToken =
+        webResponse.params?.id_token ??
+        webResponse.authentication?.idToken;
       if (idToken) {
         handleBackendLogin(idToken);
       } else {
-        console.error("Error Web: No se recibió ningún token de Google");
+        console.error('[Auth] Web: no idToken en respuesta', webResponse);
+        setLoading(false);
       }
-    } else if (Platform.OS === 'web' && response?.type === 'error') {
-      console.error("Error en Auth Session Web:", response.error);
-      alert("Error al iniciar sesión con Google en la web.");
+    } else if (webResponse.type === 'error') {
+      console.error('[Auth] Web OAuth error:', webResponse.error);
+      setLoading(false);
+    } else {
+      setLoading(false);
     }
-    
-    // Si la promesa web terminó, apagamos el loader
-    if (response) {
-      setIsLoading(false);
-    }
-  }, [response]);
+  }, [webResponse]);
 
-  async function loadStorageData() {
+  async function restoreSession() {
     try {
-      const jsonValue = await AsyncStorage.getItem('@user');
-      if (jsonValue != null) setUser(JSON.parse(jsonValue));
+      const raw = await AsyncStorage.getItem('@user');
+      if (raw) setUser(JSON.parse(raw));
     } catch (e) {
-      console.error("Error cargando sesión", e);
+      console.error('[Auth] Error restaurando sesión:', e);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }
-  
+
   async function handleBackendLogin(token: string) {
     try {
-      setIsLoading(true);
-      console.log(`[Auth] Enviando token a: ${URL_BASE}/oauth/google/login`);
-
+      setLoading(true);
       const { data } = await axios.post(
         `${URL_BASE}/oauth/google/login`,
         {},
-        { headers: { Authorization: token } }
+        { headers: { Authorization: token } },
       );
-
-      const userData = data.user || data;
-      if (!userData) throw new Error("No se recibieron datos del usuario");
-
+      const userData: User = data.user ?? data;
+      if (!userData?.id) throw new Error('Backend no devolvió datos de usuario');
       setUser(userData);
       await AsyncStorage.setItem('@user', JSON.stringify(userData));
-
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.error('[Auth] Status:', error.response?.status);
-        console.error('[Auth] Body:', JSON.stringify(error.response?.data, null, 2));
-        console.error('[Auth] Headers enviados:', error.config?.headers);
+        console.error('[Auth] Backend error', error.response?.status, error.response?.data);
         alert(`Error ${error.response?.status ?? 'red'}: ${JSON.stringify(error.response?.data)}`);
       } else {
         console.error('[Auth] Error inesperado:', error);
-        alert("Error inesperado. Revisa la consola.");
+        alert('Error inesperado al iniciar sesión.');
       }
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }
 
   const signIn = async () => {
-    setIsLoading(true);
-    try {
-      if (Platform.OS === 'web') {
-        // FLUJO WEB
-        await promptAsync();
-        // El resto se maneja en el useEffect(..., [response])
-      } else {
-        // FLUJO NATIVO (Android / iOS)
-        await GoogleSignin.hasPlayServices();
+    setLoading(true);
+    if (Platform.OS === 'web') {
+      // Web: browser OAuth flow via expo-auth-session
+      await promptAsync();
+      // response handled in useEffect above
+    } else {
+      // Native Android/iOS: Play Services native flow — no browser redirect needed
+      try {
+        await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
         await GoogleSignin.signIn();
-        
         const tokens = await GoogleSignin.getTokens();
-        
-        if (tokens.idToken) {
-          console.log("Token nativo obtenido, enviando a backend...");
-          await handleBackendLogin(tokens.idToken);
+        if (!tokens.idToken) throw new Error('No se recibió idToken de Google');
+        await handleBackendLogin(tokens.idToken);
+      } catch (error: any) {
+        setLoading(false);
+        if (isErrorWithCode(error)) {
+          switch (error.code) {
+            case statusCodes.SIGN_IN_CANCELLED:
+              break; // user cancelled, no alert needed
+            case statusCodes.IN_PROGRESS:
+              break;
+            case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+              alert('Google Play Services no está disponible o está desactualizado.');
+              break;
+            default:
+              alert(`Error de Google Sign-In (código ${error.code}). Verifica la configuración.`);
+          }
         } else {
-          throw new Error("No se recibió el idToken nativo de Google.");
-        }
-      }
-    } catch (error) {
-      console.error("Error en signIn:", error);
-      setIsLoading(false); // Detenemos el loader en caso de error
-      
-      if (Platform.OS !== 'web' && isErrorWithCode(error)) {
-        switch (error.code) {
-          case statusCodes.SIGN_IN_CANCELLED:
-            console.log("El usuario canceló el inicio de sesión");
-            break;
-          case statusCodes.IN_PROGRESS:
-            console.log("El inicio de sesión ya está en progreso");
-            break;
-          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-            alert("Los servicios de Google Play no están disponibles o están desactualizados.");
-            break;
-          default:
-            alert("Error desconocido al iniciar sesión nativa con Google.");
+          alert('Error inesperado al iniciar sesión con Google.');
         }
       }
     }
   };
 
   const signOut = async () => {
-    setIsLoading(true);
+    setLoading(true);
     try {
       if (Platform.OS !== 'web') {
         await GoogleSignin.signOut();
       }
       setUser(null);
       await AsyncStorage.removeItem('@user');
-    } catch (error) {
-      console.error("Error al cerrar sesión:", error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
+  };
+
+  const updateUserData = async (updates: Partial<User>) => {
+    if (!user) return;
+    const updated = { ...user, ...updates };
+    setUser(updated);
+    await AsyncStorage.setItem('@user', JSON.stringify(updated));
   };
 
   return (

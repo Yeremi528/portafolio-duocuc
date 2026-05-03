@@ -27,14 +27,19 @@ type Consulta struct {
 	CreatedAt    time.Time              `json:"created_at"    bson:"created_at"`
 }
 
-// ConsultaSummary es la vista resumida para el listado de historial.
+// ConsultaSummary es la vista completa para el listado de historial.
 type ConsultaSummary struct {
-	ID          string    `json:"id"`
-	OptionID    int       `json:"option_id"`
-	ImagePath   string    `json:"image_path"`
-	OverallRisk string    `json:"overall_risk"`
-	Summary     string    `json:"summary"`
-	CreatedAt   time.Time `json:"created_at"`
+	ID                   string                        `json:"id"`
+	OptionID             int                           `json:"option_id"`
+	ImagePath            string                        `json:"image_path"`
+	OverallRisk          string                        `json:"overall_risk"`
+	Summary              string                        `json:"summary"`
+	Vulnerabilities      []gemini.Vulnerability        `json:"vulnerabilities,omitempty"`
+	Recommendations      []gemini.Recommendation       `json:"recommendations,omitempty"`
+	InsuranceSuggestions []gemini.InsuranceSuggestion  `json:"insurance_suggestions,omitempty"`
+	EstimatedCost        *gemini.CostEstimate          `json:"estimated_cost,omitempty"`
+	Priority             string                        `json:"priority"`
+	CreatedAt            time.Time                     `json:"created_at"`
 }
 
 // ErrorResponse es la estructura de error estándar del módulo.

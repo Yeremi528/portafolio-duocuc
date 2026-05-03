@@ -1,6 +1,6 @@
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  Image, TextInput, Alert, ActivityIndicator, Platform,
+  Image, TextInput, Alert, ActivityIndicator, Platform, Linking,
 } from 'react-native';
 import { useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -303,8 +303,26 @@ function AnalysisResult({ result, optionId }: { result: SecurityAnalysis; option
                 <Text style={styles.recAction}>{rec.action}</Text>
               </View>
               <Text style={styles.recDesc}>{rec.description}</Text>
-              <View style={styles.categoryBadge}>
-                <Text style={styles.categoryText}>{rec.category}</Text>
+              <View style={styles.recFooter}>
+                <View style={styles.categoryBadge}>
+                  <Text style={styles.categoryText}>{rec.category}</Text>
+                </View>
+                <View style={styles.buyRow}>
+                  <TouchableOpacity
+                    style={styles.buyBtn}
+                    onPress={() => Linking.openURL(`https://www.sodimac.cl/sodimac-cl/search?Ntt=${encodeURIComponent(rec.action)}`)}
+                  >
+                    <Ionicons name="storefront-outline" size={12} color="#fff" />
+                    <Text style={styles.buyBtnText}>Sodimac</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.buyBtn, styles.buyBtnML]}
+                    onPress={() => Linking.openURL(`https://listado.mercadolibre.cl/${encodeURIComponent(rec.action)}`)}
+                  >
+                    <Ionicons name="cart-outline" size={12} color="#333" />
+                    <Text style={[styles.buyBtnText, { color: '#333' }]}>MercadoLibre</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
               {i < result.recommendations.length - 1 && <View style={styles.itemDivider} />}
             </View>
@@ -423,8 +441,13 @@ const styles = StyleSheet.create({
   recHeader:  { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
   recAction:  { fontSize: 13, fontWeight: '600', color: colors.primary, flex: 1 },
   recDesc:    { fontSize: 13, color: '#475569', lineHeight: 19, marginBottom: 6 },
+  recFooter:  { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 },
   categoryBadge: { alignSelf: 'flex-start', backgroundColor: '#EFF6FF', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
   categoryText:  { fontSize: 11, fontWeight: '600', color: colors.secondary },
+  buyRow:     { flexDirection: 'row', gap: 6 },
+  buyBtn:     { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#E8340A', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  buyBtnML:   { backgroundColor: '#FFE600' },
+  buyBtnText: { fontSize: 11, fontWeight: '700', color: '#fff' },
 
   insItem:    { paddingVertical: 8 },
   insHeader:  { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
